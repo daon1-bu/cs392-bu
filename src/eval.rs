@@ -1,26 +1,28 @@
 use std::collections::HashMap;
-use crate::utils::*; 
+use crate::utils::*;
+
+// Owned flag (true = we own it, false = borrowed)
+pub type Owned = bool;
 type Location = Ident;
-type Owned = bool;
+type Pvalue = Option<Value>;
 
 #[derive(Clone, Debug)]
 pub enum Value {
     Unit,
     Int(i32),
-    Ref(Location, Owned), 
+    Ref(Location, Owned),
 }
 
-type Pvalue = Option<Value>;
 #[derive(Clone, Debug)]
 pub struct Slot {
     pub value: Pvalue,
     pub lifetime: Lifetime,
 }
 
-#[derive(Clone, Debug, Default)] 
+#[derive(Clone, Debug, Default)]
 pub struct Store(pub HashMap<Location, Slot>);
 
-#[derive(Clone, Debug, Default)] 
+#[derive(Clone, Debug, Default)]
 pub struct Context {
     pub store: Store,
 }
@@ -70,9 +72,15 @@ impl Context {
             Expr::Unit => Value::Unit,
             Expr::Int(n) => Value::Int(*n),
 
-            Expr::Lval(lval, _) => {
+            Expr::Lval(lval, copyable) => {
                 let slot = self.store.read(lval);
-                slot.value.clone().unwrap()
+                let v = slot.value.clone().unwrap();
+
+                if !*copyable {
+                    self.store.write(lval, None);
+                }
+
+                v
             }
 
             Expr::Box(e) => {

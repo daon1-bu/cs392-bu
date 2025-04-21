@@ -1,3 +1,10 @@
-pub mod utils;  // AST tpyes Exrp, Stamt, Lfietime
-pub mod eval;   // Evaluator Comtext, Strore, Value
-pub mod types;  // Typ checker Ty, Type Context
+pub mod utils; 
+pub mod eval;  
+pub mod types;  
+
+#[cfg(test)]
+mod part_1_tests; 
+#[cfg(test)]
+mod part_2_tests; 
+#[cfg(test)]
+mod types_tests;
