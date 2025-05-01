@@ -115,6 +115,15 @@ impl Context {
 
                 result
             }
+            Expr::AssertEq(left, right) => {
+                let v1 = self.eval_expr(left, l.clone());
+                let v2 = self.eval_expr(right, l);
+                match (v1, v2) {
+                    (Value::Int(a), Value::Int(b)) => assert_eq!(a, b),
+                    _ => panic!("assert_eq! only supports integers"),
+                }
+                Value::Unit
+            }
         }
     }
 

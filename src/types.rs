@@ -16,6 +16,7 @@ pub enum Error {
     UnboundVar(String),
     InvalidMove,
     InvalidWrite,
+    IncompatibleTypes(Type, Type),
 }
 
 pub type TypeResult<T> = Result<T, Error>;
@@ -113,7 +114,7 @@ impl Env {
 }
 
 #[derive(Clone, Debug)]
-pub struct TypeContext {
+pub struct Context {
     pub env: Env,
 }
 
@@ -162,8 +163,18 @@ impl TypeContext {
                 let inner_ty = self.type_expr(inner)?;
                 Ok(Type::Box(Box::new(inner_ty)))
             }
-
+            Expr::AssertEq(left, right) => {
+                let t1 = self.type_expr(left)?;
+                let t2 = self.type_expr(right)?;
+                if t1 == Type::Int && t2 == Type::Int {
+                    Ok(Type::Unit)
+                } else {
+                    Err(Error::IncompatibleTypes(t1, t2))
+                }
+            }
+    
             _ => unimplemented!("type_expr not yet done"),
         }
     }
 }
+pub use Context as TypeContext;

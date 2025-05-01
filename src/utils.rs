@@ -36,6 +36,7 @@ pub enum Expr {
     Box(Box<Expr>),
     Borrow(Lval, bool),
     Block(Vec<Stmt>, Box<Expr>, Lifetime),
+    AssertEq(Box<Expr>, Box<Expr>),
 }
 
 #[derive(Clone, Debug, PartialEq)]
